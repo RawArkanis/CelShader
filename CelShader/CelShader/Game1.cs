@@ -25,7 +25,7 @@ namespace CelShader
 
         private Vector4 lightDir = new Vector4(0.0f, 0.0f, 1.0f, 1.0f);
 
-        private Cube cube = new Cube(Vector3.Zero, 1);
+        private Sphere sphere = new Sphere();
 
         public Game1()
         {
@@ -44,14 +44,14 @@ namespace CelShader
 
         protected override void LoadContent()
         {
-            cube.Initialize();
-            cube.LoadContent(GraphicsDevice, Content);
+            sphere.Initialize();
+            sphere.LoadContent(GraphicsDevice, Content);
             SetupCamera();
         }
 
         protected override void UnloadContent()
         {
-            cube.UnloadContent();
+            sphere.UnloadContent();
         }
 
         private void SetupCamera()
@@ -68,7 +68,7 @@ namespace CelShader
 
             //SetupCamera();
 
-            cube.Update(gameTime);
+            sphere.Update(gameTime);
 
             base.Update(gameTime);
         }
@@ -79,7 +79,7 @@ namespace CelShader
 
             worldMatrix = Matrix.Identity;
 
-            cube.Draw(GraphicsDevice, worldMatrix, viewMatrix, projectionMatrix, cameraPos, lightDir);
+            sphere.Draw(GraphicsDevice, worldMatrix, viewMatrix, projectionMatrix, cameraPos, lightDir);
 
             base.Draw(gameTime);
         }

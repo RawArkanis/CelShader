@@ -14,8 +14,8 @@ struct VertexShaderInput
 struct VertexShaderOutput
 {
     float4 Position : POSITION0;
-	float3 L : TEXCOORD1;
-	float3 N : TEXCOORD2;
+	float3 L : TEXCOORD0;
+	float3 N : TEXCOORD1;
 };
 
 VertexShaderOutput VertexShaderFunction(VertexShaderInput input)
@@ -27,22 +27,24 @@ VertexShaderOutput VertexShaderFunction(VertexShaderInput input)
     output.Position = mul(viewPosition, Projection);
 
     output.L = normalize(LightDirection);
-	output.N = normalize(mul(World, input.N));
+	output.N = normalize(mul(InverseWorld, input.N));
 
     return output;
 }
 
 float4 PixelShaderFunction(VertexShaderOutput input) : COLOR0
 {
-    float value = max(dot(input.L, input.N), 0);
+	float4 color = float4(0.5f, 0.7f, 0.0f, 1.0f);
 
-	float color = 0.8f;
-	if (value < 0.05f)
-		color = 0.3f;
-	else if (value < 0.5f)
-		color = 0.5f; 
+    float intensity = saturate(-dot(input.L, input.N));
 
-    return color;
+	float celValue = 0.75f;
+	if (intensity <= 0.25f)
+		celValue = 0.25f;
+	else if (intensity <= 0.5f)
+		celValue = 0.5f;
+
+    return celValue * color;
 }
 
 technique CelShader

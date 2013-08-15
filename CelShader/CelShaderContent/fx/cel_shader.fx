@@ -1,24 +1,21 @@
 float4x4 World;
+float4x4 InverseWorld;
 float4x4 View;
 float4x4 Projection;
 
-// TODO: add effect parameters here.
+float3 LightDirection;
 
 struct VertexShaderInput
 {
     float4 Position : POSITION0;
-
-    // TODO: add input channels such as texture
-    // coordinates and vertex colors here.
+	float3 N : NORMAL0;
 };
 
 struct VertexShaderOutput
 {
     float4 Position : POSITION0;
-
-    // TODO: add vertex shader outputs such as colors and texture
-    // coordinates here. These values will automatically be interpolated
-    // over the triangle, and provided as input to your pixel shader.
+	float3 L : TEXCOORD1;
+	float3 N : TEXCOORD2;
 };
 
 VertexShaderOutput VertexShaderFunction(VertexShaderInput input)
@@ -29,19 +26,26 @@ VertexShaderOutput VertexShaderFunction(VertexShaderInput input)
     float4 viewPosition = mul(worldPosition, View);
     output.Position = mul(viewPosition, Projection);
 
-    // TODO: add your vertex shader code here.
+    output.L = normalize(LightDirection);
+	output.N = normalize(mul(World, input.N));
 
     return output;
 }
 
 float4 PixelShaderFunction(VertexShaderOutput input) : COLOR0
 {
-    // TODO: add your pixel shader code here.
+    float value = max(dot(input.L, input.N), 0);
 
-    return float4(1, 0, 0, 1);
+	float color = 0.8f;
+	if (value < 0.05f)
+		color = 0.3f;
+	else if (value < 0.5f)
+		color = 0.5f; 
+
+    return color;
 }
 
-technique Technique1
+technique CelShader
 {
     pass Pass1
     {

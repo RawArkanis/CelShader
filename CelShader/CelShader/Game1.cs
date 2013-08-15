@@ -23,9 +23,11 @@ namespace CelShader
 
         private Vector3 cameraPos;
 
-        private Vector4 lightDir = new Vector4(0.0f, 0.0f, 1.0f, 1.0f);
+        private Vector3 lightDir = new Vector3(1.0f, 1.0f, 1.0f);
 
         private Sphere sphere = new Sphere();
+
+        private float angle = 0.0f;
 
         public Game1()
         {
@@ -56,7 +58,7 @@ namespace CelShader
 
         private void SetupCamera()
         {
-            cameraPos = new Vector3(0.0f, 5.0f, 10.0f);
+            cameraPos = new Vector3(0.0f, 5.0f, 10.0f); // TODO Rodar essa bandida
             viewMatrix = Matrix.CreateLookAt(cameraPos, new Vector3(0.0f, 0.0f, 0.0f), new Vector3(0.0f, 1.0f, 0.0f));
             projectionMatrix = Matrix.CreatePerspectiveFieldOfView(MathHelper.PiOver4, GraphicsDevice.Viewport.AspectRatio, 0.1f, 1000.0f);
         }
@@ -66,7 +68,7 @@ namespace CelShader
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed)
                 this.Exit();
 
-            //SetupCamera();
+            SetupCamera();
 
             sphere.Update(gameTime);
 

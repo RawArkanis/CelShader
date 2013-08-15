@@ -32,7 +32,7 @@ namespace CelShader.Entity
 
             model = content.Load<Model>("model\\sphere");
 
-            effect = new BasicEffect(device);
+            effect = content.Load<Effect>("fx\\cel_shader");
         }
 
         public void UnloadContent()
@@ -48,14 +48,34 @@ namespace CelShader.Entity
             angle += 0.5f * time;
         }
 
-        public void Draw(GraphicsDevice device, Matrix world, Matrix view, Matrix projection, Vector3 cameraPos, Vector4 lightDirection)
+        public void Draw(GraphicsDevice device, Matrix world, Matrix view, Matrix projection, Vector3 cameraPos, Vector3 lightDirection)
         {
             /*if (isInitialized == false)
                 return;*/
 
             foreach (ModelMesh mesh in model.Meshes)
             {
-                mesh.Draw();
+                effect.Parameters["World"].SetValue(world);
+                effect.Parameters["InverseWorld"].SetValue(Matrix.Invert(world));
+                effect.Parameters["View"].SetValue(view);
+                effect.Parameters["Projection"].SetValue(projection);
+                effect.Parameters["LightDirection"].SetValue(lightDirection);
+
+                foreach (ModelMeshPart meshPart in mesh.MeshParts)
+                {
+                    device.SetVertexBuffer(meshPart.VertexBuffer, meshPart.VertexOffset);
+                    device.Indices = meshPart.IndexBuffer;
+
+                    effect.CurrentTechnique = effect.Techniques["CelShader"];
+
+                    foreach (EffectPass effectPass in effect.CurrentTechnique.Passes)
+                    {
+                        effectPass.Apply();
+
+                        device.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0,
+                            meshPart.NumVertices, meshPart.StartIndex, meshPart.PrimitiveCount);
+                    }
+                }
             }
 
         }

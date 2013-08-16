@@ -23,7 +23,10 @@ namespace CelShader
 
         private Vector3 cameraPos;
 
-        private Vector3 lightDir = new Vector3(1.0f, -1.0f, -1.0f);
+        private Vector3 lightDir;
+        private float lightDirX = 0.0f;
+        private float lightDirY = -1.0f;
+        private float lightDirZ = 0.0f;
 
         private Sphere sun = new Sphere(Sphere.SphereType.Sun);
         private Sphere earth = new Sphere(Sphere.SphereType.Earth);
@@ -74,7 +77,52 @@ namespace CelShader
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed)
                 this.Exit();
 
-            //angle += 0.1f * time;
+            KeyboardState keyState = Keyboard.GetState();
+
+            if (keyState.IsKeyDown(Keys.Q))
+            {
+                lightDirX += 0.01f;
+                if (lightDirX > 1.0f)
+                    lightDirX = 1.0f;
+            }
+            else if (keyState.IsKeyDown(Keys.A))
+            {
+                lightDirX -= 0.01f;
+                if (lightDirX < -1.0f)
+                    lightDirX = -1.0f;
+            }
+
+            if (keyState.IsKeyDown(Keys.W))
+            {
+                lightDirY += 0.01f;
+                if (lightDirY > 1.0f)
+                    lightDirY = 1.0f;
+            }
+            else if (keyState.IsKeyDown(Keys.S))
+            {
+                lightDirY -= 0.01f;
+                if (lightDirY < -1.0f)
+                    lightDirY = -1.0f;
+            }
+
+            if (keyState.IsKeyDown(Keys.E))
+            {
+                lightDirZ += 0.01f;
+                if (lightDirZ > 1.0f)
+                    lightDirZ = 1.0f;
+            }
+            else if (keyState.IsKeyDown(Keys.D))
+            {
+                lightDirZ -= 0.01f;
+                if (lightDirZ < -1.0f)
+                    lightDirZ = -1.0f;
+            }
+
+            if (keyState.IsKeyDown(Keys.Left))
+                angle -= 0.1f;
+            else if (keyState.IsKeyDown(Keys.Right))
+                angle += 0.1f;
+
 
             SetupCamera();
 
@@ -89,6 +137,7 @@ namespace CelShader
         {
             GraphicsDevice.Clear(Color.Wheat);
 
+            lightDir = new Vector3(lightDirX, lightDirY, lightDirZ);
             worldMatrix = Matrix.Identity;
 
             worldMatrix = sun.Draw(GraphicsDevice, worldMatrix, viewMatrix, projectionMatrix, cameraPos, lightDir);

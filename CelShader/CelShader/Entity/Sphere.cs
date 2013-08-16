@@ -46,14 +46,14 @@ namespace CelShader.Entity
                     break;
                 case SphereType.Earth:
                     rotation = 0.5f;
-                    rotation2 = 1.0f;
+                    rotation2 = 5.0f;
                     translation = new Vector3(5.0f, 0.0f, 0.0f);
                     scale = 0.75f;
                     break;
                 case SphereType.Moon:
                     rotation = 0.75f;
                     rotation2 = 0.0f;
-                    translation = new Vector3(-1.0f, 1.0f, 0.0f);
+                    translation = new Vector3(-1.5f, 0.0f, 0.0f);
                     scale = 0.25f;
                     break;
             }
@@ -139,7 +139,7 @@ namespace CelShader.Entity
             switch (type)
             {
                 case SphereType.Earth:
-                    localWorld = Matrix.CreateRotationY(angle2) * Matrix.CreateRotationX(angle2) * localWorld;
+                    localWorld = Matrix.CreateRotationY(angle2) * localWorld;
                     break;
                 default:
                     localWorld = Matrix.CreateRotationY(angle2) * localWorld;

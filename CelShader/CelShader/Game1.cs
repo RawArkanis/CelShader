@@ -25,7 +25,9 @@ namespace CelShader
 
         private Vector3 lightDir = new Vector3(1.0f, -1.0f, -1.0f);
 
-        private Sphere sphere = new Sphere();
+        private Sphere sun = new Sphere(Sphere.SphereType.Sun);
+        private Sphere earth = new Sphere(Sphere.SphereType.Earth);
+        private Sphere moon = new Sphere(Sphere.SphereType.Moon);
 
         private float angle = 0.0f;
 
@@ -46,21 +48,21 @@ namespace CelShader
 
         protected override void LoadContent()
         {
-            sphere.Initialize();
-            sphere.LoadContent(GraphicsDevice, Content);
+            sun.LoadContent(GraphicsDevice, Content);
+            earth.LoadContent(GraphicsDevice, Content);
+            moon.LoadContent(GraphicsDevice, Content);
             SetupCamera();
         }
 
         protected override void UnloadContent()
         {
-            sphere.UnloadContent();
         }
 
         private void SetupCamera()
         {
             Matrix rotation = Matrix.CreateRotationY(angle);
 
-            cameraPos = Vector3.Transform(new Vector3(0.0f, 5.0f, 10.0f), rotation); // TODO Rodar essa bandida
+            cameraPos = Vector3.Transform(new Vector3(0.0f, 6.0f, 12.0f), rotation);
             viewMatrix = Matrix.CreateLookAt(cameraPos, new Vector3(0.0f, 0.0f, 0.0f), new Vector3(0.0f, 1.0f, 0.0f));
             projectionMatrix = Matrix.CreatePerspectiveFieldOfView(MathHelper.PiOver4, GraphicsDevice.Viewport.AspectRatio, 0.1f, 1000.0f);
         }
@@ -72,22 +74,26 @@ namespace CelShader
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed)
                 this.Exit();
 
-            angle += 0.5f * time;
+            //angle += 0.1f * time;
 
             SetupCamera();
 
-            sphere.Update(gameTime);
+            sun.Update(gameTime);
+            earth.Update(gameTime);
+            moon.Update(gameTime);
 
             base.Update(gameTime);
         }
 
         protected override void Draw(GameTime gameTime)
         {
-            GraphicsDevice.Clear(Color.Black);
+            GraphicsDevice.Clear(Color.Wheat);
 
             worldMatrix = Matrix.Identity;
 
-            sphere.Draw(GraphicsDevice, worldMatrix, viewMatrix, projectionMatrix, cameraPos, lightDir);
+            worldMatrix = sun.Draw(GraphicsDevice, worldMatrix, viewMatrix, projectionMatrix, cameraPos, lightDir);
+            worldMatrix = earth.Draw(GraphicsDevice, worldMatrix, viewMatrix, projectionMatrix, cameraPos, lightDir);
+            moon.Draw(GraphicsDevice, worldMatrix, viewMatrix, projectionMatrix, cameraPos, lightDir);
 
             base.Draw(gameTime);
         }

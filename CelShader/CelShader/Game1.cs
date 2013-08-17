@@ -1,13 +1,5 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Audio;
-using Microsoft.Xna.Framework.Content;
-using Microsoft.Xna.Framework.GamerServices;
-using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using Microsoft.Xna.Framework.Media;
 using CelShader.Entity;
 
 namespace CelShader
@@ -17,22 +9,25 @@ namespace CelShader
     {
         GraphicsDeviceManager graphics;
 
+        // Matrixes
         private Matrix viewMatrix;
         private Matrix projectionMatrix;
         private Matrix worldMatrix;
 
+        // Camera Position and rotation angle
         private Vector3 cameraPos;
+        private float angle = 0.0f;
 
-        private Vector3 lightDir;
-        private float lightDirX = 0.0f;
-        private float lightDirY = -1.0f;
-        private float lightDirZ = 0.0f;
+        // Light Direction and rotation angles
+        private Vector3 lightDir = new Vector3(0.0f, -1.0f, 0.0f);
+        private float lightXAngle = 0.0f;
+        private float lightYAngle = 0.0f;
+        private float lightZAngle = 0.0f;
 
+        // Objects
         private Sphere sun = new Sphere(Sphere.SphereType.Sun);
         private Sphere earth = new Sphere(Sphere.SphereType.Earth);
         private Sphere moon = new Sphere(Sphere.SphereType.Moon);
-
-        private float angle = 0.0f;
 
         public Game1()
         {
@@ -44,16 +39,14 @@ namespace CelShader
             Content.RootDirectory = "Content";
         }
 
-        protected override void Initialize()
-        {
-            base.Initialize();
-        }
-
         protected override void LoadContent()
         {
+            // Load objects
             sun.LoadContent(GraphicsDevice, Content);
             earth.LoadContent(GraphicsDevice, Content);
             moon.LoadContent(GraphicsDevice, Content);
+
+            // Setup initial camera
             SetupCamera();
         }
 
@@ -63,8 +56,10 @@ namespace CelShader
 
         private void SetupCamera()
         {
+            // Create camera rotation matrix
             Matrix rotation = Matrix.CreateRotationY(angle);
 
+            // Calculate camera position, view and projection
             cameraPos = Vector3.Transform(new Vector3(0.0f, 6.0f, 12.0f), rotation);
             viewMatrix = Matrix.CreateLookAt(cameraPos, new Vector3(0.0f, 0.0f, 0.0f), new Vector3(0.0f, 1.0f, 0.0f));
             projectionMatrix = Matrix.CreatePerspectiveFieldOfView(MathHelper.PiOver4, GraphicsDevice.Viewport.AspectRatio, 0.1f, 1000.0f);
@@ -72,60 +67,39 @@ namespace CelShader
 
         protected override void Update(GameTime gameTime)
         {
-            float time = (float)gameTime.ElapsedGameTime.TotalSeconds;
-
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed)
                 this.Exit();
 
             KeyboardState keyState = Keyboard.GetState();
 
+            // Rotate by X axis
             if (keyState.IsKeyDown(Keys.Q))
-            {
-                lightDirX += 0.01f;
-                if (lightDirX > 1.0f)
-                    lightDirX = 1.0f;
-            }
+                lightXAngle -= 0.05f;
             else if (keyState.IsKeyDown(Keys.A))
-            {
-                lightDirX -= 0.01f;
-                if (lightDirX < -1.0f)
-                    lightDirX = -1.0f;
-            }
+                lightXAngle += 0.05f;
 
+            // Rotate by Y axis
             if (keyState.IsKeyDown(Keys.W))
-            {
-                lightDirY += 0.01f;
-                if (lightDirY > 1.0f)
-                    lightDirY = 1.0f;
-            }
+                lightYAngle -= 0.05f;
             else if (keyState.IsKeyDown(Keys.S))
-            {
-                lightDirY -= 0.01f;
-                if (lightDirY < -1.0f)
-                    lightDirY = -1.0f;
-            }
+                lightYAngle += 0.05f;
 
+            // Rotate by Z axis
             if (keyState.IsKeyDown(Keys.E))
-            {
-                lightDirZ += 0.01f;
-                if (lightDirZ > 1.0f)
-                    lightDirZ = 1.0f;
-            }
+                lightZAngle -= 0.05f;
             else if (keyState.IsKeyDown(Keys.D))
-            {
-                lightDirZ -= 0.01f;
-                if (lightDirZ < -1.0f)
-                    lightDirZ = -1.0f;
-            }
+                lightZAngle += 0.05f;
 
+            // Rotate Camera by Y axis
             if (keyState.IsKeyDown(Keys.Left))
-                angle -= 0.1f;
+                angle -= 0.05f;
             else if (keyState.IsKeyDown(Keys.Right))
-                angle += 0.1f;
+                angle += 0.05f;
 
-
+            // Resetup camera
             SetupCamera();
 
+            // Update objects
             sun.Update(gameTime);
             earth.Update(gameTime);
             moon.Update(gameTime);
@@ -137,12 +111,16 @@ namespace CelShader
         {
             GraphicsDevice.Clear(Color.Wheat);
 
-            lightDir = new Vector3(lightDirX, lightDirY, lightDirZ);
+            // Recalculate light direction
+            Vector3 newLightDir = Vector3.Transform(lightDir,
+                Matrix.CreateRotationX(lightXAngle)*Matrix.CreateRotationY(lightYAngle)*
+                Matrix.CreateRotationZ(lightZAngle));
             worldMatrix = Matrix.Identity;
 
-            worldMatrix = sun.Draw(GraphicsDevice, worldMatrix, viewMatrix, projectionMatrix, cameraPos, lightDir);
-            worldMatrix = earth.Draw(GraphicsDevice, worldMatrix, viewMatrix, projectionMatrix, cameraPos, lightDir);
-            moon.Draw(GraphicsDevice, worldMatrix, viewMatrix, projectionMatrix, cameraPos, lightDir);
+            // Draw objects 
+            worldMatrix = sun.Draw(GraphicsDevice, worldMatrix, viewMatrix, projectionMatrix, cameraPos, newLightDir);
+            worldMatrix = earth.Draw(GraphicsDevice, worldMatrix, viewMatrix, projectionMatrix, cameraPos, newLightDir);
+            moon.Draw(GraphicsDevice, worldMatrix, viewMatrix, projectionMatrix, cameraPos, newLightDir);
 
             base.Draw(gameTime);
         }

@@ -11,6 +11,7 @@ namespace CelShader.Entity
     class Sphere
     {
 
+        // Object type
         public enum SphereType {
             Sun,
             Earth,
@@ -19,15 +20,22 @@ namespace CelShader.Entity
 
         private Effect effect;
         private Model model;
+
+        // Texture
         private Texture2D texture;
+        // CelMap
         private Texture2D celTexture;
+        // EdgeMap
         private Texture2D edgeTexture;
 
         private float angle = 0.0f;
         private float angle2 = 0.0f;
+
         private float rotation;
         private float rotation2;
+
         private float scale;
+
         private Vector3 translation;
 
         private SphereType type;
@@ -80,8 +88,8 @@ namespace CelShader.Entity
 
             texture = content.Load<Texture2D>("texture\\" + name);
 
-            celTexture = content.Load<Texture2D>("texture\\cel_map");
-            edgeTexture = content.Load<Texture2D>("texture\\edge_map");
+            celTexture = content.Load<Texture2D>("texture\\cel_map01");
+            edgeTexture = content.Load<Texture2D>("texture\\edge_map01");
 
             effect = content.Load<Effect>("fx\\cel_shader");
         }

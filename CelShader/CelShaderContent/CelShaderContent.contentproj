@@ -42,15 +42,15 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="texture\cel_map.bmp">
-      <Name>cel_map</Name>
+    <Compile Include="texture\cel_map01.bmp">
+      <Name>cel_map01</Name>
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="texture\edge_map.bmp">
-      <Name>edge_map</Name>
+    <Compile Include="texture\edge_map01.bmp">
+      <Name>edge_map01</Name>
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
     </Compile>

@@ -21,6 +21,7 @@ texture ColorMap;
 texture CelMap;
 texture EdgeMap;
 
+// Texture Samples
 sampler ColorMapSampler = sampler_state
 {
 	Texture = <ColorMap>;
@@ -31,6 +32,7 @@ sampler ColorMapSampler = sampler_state
 	AddressV = Clamp;
 };
 
+// CelMap Texture Sampler
 sampler CelMapSampler = sampler_state
 {
 	Texture = <CelMap>;
@@ -41,6 +43,7 @@ sampler CelMapSampler = sampler_state
 	AddressV = Clamp;
 };
 
+// EdgeMap Texture Sampler
 sampler EdgeMapSampler = sampler_state
 {
 	Texture = <EdgeMap>;
@@ -77,9 +80,11 @@ VertexShaderOutput VertexShaderFunction(VertexShaderInput input)
 
 	output.T = input.T;
 
+	// Normalize and translate Light and Normals
     output.L = normalize(LightDirection);
 	output.N = normalize(mul(input.N, World));
 
+	// Detect edge
 	float3 eye = normalize(CameraPosition - worldPosition.xyz);
 	output.Edge = max(dot(output.N, eye), 0.0f);
 
@@ -88,13 +93,17 @@ VertexShaderOutput VertexShaderFunction(VertexShaderInput input)
 
 float4 PixelShaderFunction(VertexShaderOutput input) : COLOR0
 {
+	// Extract color from texture
 	float4 color = tex2D(ColorMapSampler, input.T);
 
+	// Extract CelMap value
     float2 celIndex = float2(saturate(-dot(input.L, input.N)), 0.0f);
 	float4 celColor = tex2D(CelMapSampler, celIndex);
 
+	// Extract EdgeMap value
 	float4 edgeColor = tex2D(EdgeMapSampler, input.Edge);
 
+	// Calculate final color
 	return edgeColor * ((color * AmbientColor * AmbientIntensity) + (color * LightColor * celColor * LightIntensity));
 }
 
